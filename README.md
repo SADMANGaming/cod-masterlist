@@ -1,13 +1,10 @@
 # cod-masterlist
 Supported games:
 
-CoD1: 1.1,1.5
-
-CoDUO: 1.41, 1.51
-
-CoD2: 1.0,1.2,1.3
-
-CoD4: 1.0,1.7,1.8
+- CoD1: 1.1,1.5
+- CoDUO: 1.41, 1.51
+- CoD2: 1.0,1.2,1.3
+- CoD4: 1.0,1.7,1.8
 
 # Features:
 - You can search for specific servers.
