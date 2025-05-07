@@ -16,7 +16,7 @@ Supported games:
 - Filter Example: GET /servers/game=GAME&ver=VER&hideempty=**true**
 
 # Errors:
--Some servers may not be retrieved.
+- Some servers may not be retrieved.
 
 ### Credits:
 - ChatGPT
