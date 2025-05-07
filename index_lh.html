@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Credits: GPT, W3School etc -->
+    <meta charset="UTF-8">
+    <title>Call of Duty Server List</title>
+    <style>
+
+        /* Gpt's css*/
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: rgb(0, 0, 0);
+            color: white;
+        }
+
+        .header-counter {
+            background-color: #444;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .server-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .server-table th, .server-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .server-details {
+            display: none;
+        }
+
+        .toggle-button {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .toggle-button:hover {
+            background-color: #0056b3;
+        }
+
+        .color-0 { color: black; }
+        .color-1 { color: red; }
+        .color-2 { color: green; }
+        .color-3 { color: yellow; }
+        .color-4 { color: blue; }
+        .color-5 { color: cyan; }
+        .color-6 { color: pink; }
+        .color-7 { color: white; }
+
+        nav {
+            background-color: #333;
+            padding: 10px 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px;
+        }
+
+        nav a:hover {
+            background-color: #555;
+        }
+
+        .player-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            color: white;
+        }
+
+        .player-table th, .player-table td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: left;
+        }
+
+        .dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.dropdown select {
+    width: 10%;
+    padding: 12px;
+    background-color: #333; /* Matches the dark theme */
+    color: white;
+    font-size: 16px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.dropdown select:focus {
+    border-color: #777; /* Subtle change on focus */
+    outline: none; /* Remove default outline */
+}
+
+.dropdown select:hover {
+    background-color: #444; /* Lighter background on hover */
+}
+
+.dropdown::after {
+    font-size: 20px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none; /* Prevents interference with dropdown actions */
+}
+/* Search input */
+#myInput {
+  width: 250px;
+  padding: 8px 12px;
+  margin: 10px 0;
+  border: 1px solid #aca1a1;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s ease-in-out;
+  background-color: rgb(0, 0, 0);
+  color: white;
+}
+
+#myInput:focus {
+  border-color: #000000;
+  outline: none;
+  box-shadow: 0 0 4px #007bff55;
+}
+
+/* Checkbox labels */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #000000; /* Modern checkbox styling */
+}
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="https://cod1.rf.gd/">CoD1Hub</a>
+    </nav>
+
+
+    <div class="header-counter" id="server-stats">Loading server stats...</div>
+
+
+   <div class="dropdown">  
+        <select id="dropdown">
+            <option value="1">COD 1.1</option>
+            <option value="6">COD 1.5</option>
+            <option value="21">CODUO 1.41</option>
+            <option value="22">CODUO 1.51</option>
+            <option value="115">COD2 1.0</option>
+            <option value="117">COD2 1.2</option>
+            <option value="118">COD2 1.3</option>
+            <option value="41">COD4 1.0</option>
+            <option value="46">COD4 1.7</option>
+            <option value="47">COD4 1.8</option>
+
+        </select>
+    </div>     
+<!-- W3School:-->    
+    <input type="text" id="myInput" onkeyup="searchFunc()" placeholder="Search hostname">
+
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="hideempty" onclick="fetchServers()"> Hide empty</label>
+      <label><input type="checkbox" id="hidepass" onclick="fetchServers()"> Hide password</label>
+    </div>
+    
+
+    
+
+    <table class="server-table" id="servers">
+        <thead>
+            <tr>
+                <th>PW</th>
+                <th>Hostname</th>
+                <th>IP</th>
+                <th>Map</th>
+                <th>Gametype</th>
+                <th>Players</th>
+                <th>Extension</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Helper function to replace color codes with HTML spans
+        function makeColor(text) {
+            //gpt
+            const colorCodes = {
+                '^0': 'color-0', // Black
+                '^1': 'color-1', // Red
+                '^2': 'color-2', // Green
+                '^3': 'color-3', // Yellow
+                '^4': 'color-4', // Blue
+                '^5': 'color-5', // Cyan
+                '^6': 'color-6', // Pink
+                '^7': 'color-7'  // White
+            };
+
+            // Replace color codes with the corresponding span
+            Object.keys(colorCodes).forEach(code => {
+                const regex = new RegExp(`\\${code}`, 'g');
+                const colorClass = colorCodes[code];
+                text = text.replace(regex, `<span class="${colorClass}">`);
+            });
+
+            // Close the spans correctly by replacing opening tags
+            text = text.replace(/<\/span><span/g, '<span'); // Fix unmatched spans
+            text = text.replace(/<\/span>$/g, ''); // Remove any trailing span tags
+
+            return text;
+        }
+
+
+function searchFunc() {
+    //w3
+    var input = document.getElementById('myInput');
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("servers");
+    var tbody = table.getElementsByTagName('tbody')[0];
+    var rows = tbody.getElementsByTagName('tr');
+
+    for (var i = 0; i < rows.length; i++) {
+        var rowText = rows[i].innerText.toUpperCase();
+
+        if (rowText.indexOf(filter) > -1) {
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+}
+
+
+
+async function fetchServers() {
+    //me
+        const dropdown = document.getElementById('dropdown');
+        
+        const apiUrls = {
+            1: 'http://localhost:3000/servers?game=cod1&ver=1.1',
+            6: 'http://localhost:3000/servers?game=cod1&ver=1.5',
+
+            21: 'http://localhost:3000/servers?game=coduo&ver=1.41',
+            22: 'http://localhost:3000/servers?game=coduo&ver=1.51',
+
+            115: 'http://localhost:3000/servers?game=cod2&ver=1.0',
+            117: 'http://localhost:3000/servers?game=cod2&ver=1.2',
+            118: 'http://localhost:3000/servers?game=cod2&ver=1.3',
+
+            41: 'http://localhost:3000/servers?game=cod4&ver=1.0',
+            46: 'http://localhost:3000/servers?game=cod4&ver=1.7',
+            47: 'http://localhost:3000/servers?game=cod4&ver=1.8'
+        };
+
+        var hideEmpty = document.getElementById("hideempty");
+        var hidePass = document.getElementById("hidepass");
+
+        try {
+            const selectedValue = parseInt(dropdown.value);
+    
+            let apiUrl = apiUrls[selectedValue] || 'http://localhost:3000/servers';
+        if (hideEmpty.checked && hidePass.checked) {
+            apiUrl += "&hideempty=true&hidepass=true";
+        } else if (hideEmpty.checked) {
+            apiUrl += "&hideempty=true";
+        } else if (hidePass.checked) {
+            apiUrl += "&hidepass=true";
+        }
+
+
+            const res = await fetch(apiUrl);
+            const data = await res.json();
+
+            const statsDiv = document.getElementById('server-stats');
+            const tbody = document.querySelector('#servers tbody');
+            tbody.innerHTML = '';
+
+
+            // it was hard ngl
+            const dateFromAPI = new Date(data.lastUpdated);
+            const newdate = new Date();
+            const diffInMilliseconds = newdate - dateFromAPI;
+            const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+
+            let stats = `Last Updated: ${data.lastUpdated} (${diffInSeconds} seconds ago)\nTotal Servers: ${data.totalServers}`;
+            for (const [ext, count] of Object.entries(data.extensions)) {
+                stats += ` | ${ext}: ${count}`;
+            }
+            statsDiv.innerText = stats;
+
+            data.servers.forEach((server, i) => {
+                const row = document.createElement('tr');
+
+                const coloredHostname = makeColor(server.hostname);
+                let htmlpw = server.password === "1"
+                    ? `<img src="lock.png" style="width:25px;height:25px;">`
+                    : `<img src="unlock.png" style="width:20px;height:20px;">`;
+
+                row.innerHTML = `
+                    <td>${htmlpw}</td>
+                    <td>${coloredHostname}</td>
+                    <td>${server.ip}:${server.port}</td>
+                    <td>${server.mapname}</td>
+                    <td>${server.gametype}</td>
+                    <td>${server.clients}/${server.maxclients}</td>
+                    <td>${server.extensions}</td>
+                    <td><button class="toggle-button" onclick="toggleDetails(${i})">View</button></td>
+                `;
+
+                tbody.appendChild(row);
+
+                const detailsRow = document.createElement('tr');
+                detailsRow.className = 'server-details';
+                detailsRow.id = `details-${i}`;
+
+                const playerTable = server.players.map(player => `
+                    <tr><td>${makeColor(player.name)}</td><td>${player.score}</td><td>${player.ping}</td></tr>
+                `).join('');
+
+                detailsRow.innerHTML = `
+                    <td colspan="8">
+                        <strong>Owner: ${server.owner}</strong><br>
+                        <strong>Discord: ${server.discord}</strong><br>
+                        <strong>Website: ${server.website}</strong><br>
+                        <strong>Contact: ${server.contact}</strong><br>
+                        <strong>Players:</strong>
+                        <table class="player-table">
+                            <thead><tr><th>Name</th><th>Score</th><th>Ping</th></tr></thead>
+                            <tbody>${playerTable || '<tr><td colspan="3">No players</td></tr>'}</tbody>
+                        </table>
+                    </td>
+                `;
+                tbody.appendChild(detailsRow);
+            });
+        } catch (err) {
+            console.error(err);
+            document.getElementById('server-stats').textContent = 'Failed to fetch servers.';
+        }
+    }
+
+    function toggleDetails(i) {
+        const row = document.getElementById(`details-${i}`);
+        row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+    }
+
+    // Initial fetch
+    fetchServers();
+
+    // Align to 40s interval
+    const firstWaitTime = (40 - (new Date().getUTCSeconds() % 40)) * 1000;
+    setTimeout(() => {
+        fetchServers();
+        setInterval(fetchServers, 40 * 1000);
+    }, firstWaitTime);
+
+    // Also refetch when dropdown changes
+    document.getElementById('dropdown').addEventListener('change', fetchServers);
+
+/*            const dropdown = document.getElementById('dropdown');
+
+            const apiUrls = {
+                1: 'http://localhost:3000/servers?game=cod1&ver=1.1',
+                6: 'http://localhost:3000/servers?game=cod1&ver=1.5',
+                21: 'http://localhost:3000/servers?game=coduo&ver=1.41',
+                22: 'http://localhost:3000/servers?game=coduo&ver=1.51'
+                //1: 'http://localhost:3000/servers?game=cod1&ver=1.1'
+            };
+
+            try {
+
+                const res = await fetch('http://localhost:3000/servers');
+                const data = await res.json();
+
+                const statsDiv = document.getElementById('server-stats');
+                const tbody = document.querySelector('#servers tbody');
+                tbody.innerHTML = '';
+
+
+                const dateFromAPI = new Date(data.lastUpdated); // turn the string into a Date
+                const newdate = new Date();
+
+                const diffInMilliseconds = newdate - dateFromAPI;
+
+                const diffInSeconds = Math.floor(diffInMilliseconds / 1000); // use Math.floor to round dow
+
+                let stats = `Last Updated: ${data.lastUpdated} (${diffInSeconds} seconds ago)\nTotal Servers: ${data.totalServers}`;
+                for (const [ext, count] of Object.entries(data.extensions)) {
+                    stats += ` | ${ext}: ${count}`;
+                }
+                //statsDiv.textContent = stats;
+                statsDiv.innerText = stats;
+
+                data.servers.forEach((server, i) => {
+                    const row = document.createElement('tr');
+
+                    // Apply color formatting to hostname
+                    const coloredHostname = makeColor(server.hostname);
+                    if(server.password === "1")
+                    {
+                        htmlpw = `<img src = "lock.png" style="width:25px;height:25px;">`;
+                    } else {
+                        htmlpw = `<img src = "unlock.png" style="width:20px;height:20px;">`;
+                    }
+
+                    row.innerHTML = `
+                        <td>${htmlpw}</td>
+                        <td>${coloredHostname}</td>
+                        <td>${server.ip}:${server.port}</td>
+                        <td>${server.mapname}</td>
+                        <td>${server.gametype}</td>
+                        <td>${server.clients}/${server.maxclients}</td>
+                        <td>${server.extensions}</td>
+                        <td><button class="toggle-button" onclick="toggleDetails(${i})">View</button></td>
+                    `;
+
+                    tbody.appendChild(row);
+
+                    const detailsRow = document.createElement('tr');
+                    detailsRow.className = 'server-details';
+                    detailsRow.id = `details-${i}`;
+
+                    const playerTable = server.players.map(player => `
+                        <tr><td>${makeColor(player.name)}</td><td>${player.score}</td><td>${player.ping}</td></tr>
+                    `).join('');
+
+                    detailsRow.innerHTML = `
+                        <td colspan="6">
+                            <strong>Discord: ${server.discord}\n</strong>
+                            <br>
+                            <strong>Website: ${server.website}\n</strong>
+                            <br>
+                            <strong>Players:</strong>
+                            <table class="player-table">
+                                <thead><tr><th>Name</th><th>Score</th><th>Ping</th></tr></thead>
+                                <tbody>${playerTable || '<tr><td colspan="3">No players</td></tr>'}</tbody>
+                            </table>
+                        </td>
+                    `;
+                    tbody.appendChild(detailsRow);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById('server-stats').textContent = 'Failed to fetch servers.';
+            }
+        }
+
+        function toggleDetails(i) {
+            const row = document.getElementById(`details-${i}`);
+            row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+        }
+
+        fetchServers();
+        const firstWaitTime = (40 - (new Date().getUTCSeconds() % 40)) * 1000;
+
+setTimeout(() => {
+    fetchServers(); // fetch once after aligning
+    setInterval(fetchServers, 40 * 1000); // every 40s after that
+}, firstWaitTime);*/
+    </script>
+</body>
+</html>

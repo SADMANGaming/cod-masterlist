@@ -1,0 +1,20 @@
+{
+  "name": "cod1-master-server",
+  "version": "1.0.0",
+  "description": "CoD 1.1 Masterlist",
+  "main": "cache.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node cache.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dgram": "^1.0.1",
+    "dns": "^0.1.2",
+    "express": "^5.1.0",
+    "path": "^0.12.7"
+  }
+}
