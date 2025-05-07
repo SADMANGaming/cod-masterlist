@@ -18,6 +18,9 @@ Supported games:
 # Errors:
 - Some servers may not be retrieved.
 
+# Screenshot:
+<img src="./image.png">
+
 ### Credits:
 - ChatGPT
 - cod.pm
