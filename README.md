@@ -17,7 +17,7 @@
 # Errors:
 -Some servers may not be retrieved.
 
-## Credits:
+### Credits:
 -ChatGPT
 -cod.pm
 -w3school
